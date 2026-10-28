@@ -1,0 +1,26 @@
+Checks:
+  - bugprone-*
+  - clang-analyzer-*
+  - clang-diagnostic-*
+  - cppcoreguidelines-*
+  - modernize-*
+  - readability-*
+  - misc-const-correctness
+  - -bugprone-easily-swappable-parameters
+  - -cppcoreguidelines-pro-type-vararg
+  - -modernize-use-trailing-return-type
+  - -readability-function-cognitive-complexity
+  - -readability-implicit-bool-conversion
+  - -readability-magic-numbers
+  - -readability-math-missing-parentheses
+  - -readability-qualified-auto
+CheckOptions:
+  modernize-use-auto.MinTypeNameLength: 1
+  modernize-use-auto.RemoveStars: true
+  readability-identifier-length.MinimumVariableNameLength: 2
+  readability-identifier-length.IgnoredVariableNames: _
+  readability-identifier-length.MinimumBindingNameLength: 2
+  readability-identifier-length.IgnoredBindingNames: _
+  readability-identifier-length.MinimumParameterNameLength: 1
+  readability-identifier-length.MinimumLoopCounterNameLength: 1
+  readability-identifier-length.MinimumExceptionNameLength: 1

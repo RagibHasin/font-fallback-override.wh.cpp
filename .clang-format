@@ -1,0 +1,111 @@
+# BasedOnStyle: Chromium
+# IndentWidth: 4
+# TabWidth: 4
+# UseTab: Never
+CommentPragmas: '^[ \t]+(@[a-zA-Z]+|WHAM@[0-9]+ )'
+
+# Mimic Rustfmt's default formatting style.
+# Based on the closest available LLVM/Clang formatting options.
+
+BasedOnStyle: LLVM
+
+# Indentation
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ContinuationIndentWidth: 4
+IndentCaseLabels: true
+IndentPPDirectives: None
+
+# Line width
+ColumnLimit: 100
+ReflowComments: Always
+
+# Braces and blocks
+BreakBeforeBraces: Attach
+BraceWrapping:
+  AfterClass: false
+  AfterControlStatement: Never
+  AfterEnum: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterStruct: false
+  AfterUnion: false
+  BeforeCatch: false
+  BeforeElse: false
+  IndentBraces: false
+InsertBraces: true
+
+# Functions and declarations
+AllowShortFunctionsOnASingleLine: None
+AllowShortLambdasOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+BinPackArguments: false
+BinPackParameters: AlwaysOnePerLine
+BreakAfterReturnType: Automatic
+BreakConstructorInitializers: BeforeComma
+ConstructorInitializerIndentWidth: 4
+
+# Pointers and references
+DerivePointerAlignment: false
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+# Parentheses and brackets
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpaceInEmptyParentheses: false
+
+# Operators and expressions
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeTernaryOperators: true
+AlignOperands: Align
+AlignAfterOpenBracket: BlockIndent
+
+# Alignment
+AlignConsecutiveAssignments:
+  Enabled: false
+AlignConsecutiveDeclarations:
+  Enabled: false
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 1
+AlignEscapedNewlines: Right
+
+# Includes
+SortIncludes:
+  Enabled: true
+  IgnoreCase: false
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: "^<[^.>]+>"
+    Priority: 1
+  - Regex: '^<windhawk[^>]+\.h>'
+    Priority: 3
+  - Regex: '^<[^>]+\.h>'
+    Priority: 2
+  - Regex: '^".*"'
+    Priority: 4
+
+# Templates
+AlwaysBreakTemplateDeclarations: Yes
+SpacesInAngles: Never
+
+# C++ specifics
+Cpp11BracedListStyle: true
+SpaceBeforeCpp11BracedList: false
+Standard: Latest
+
+# Miscellaneous
+MaxEmptyLinesToKeep: 1
+KeepEmptyLines:
+  AtStartOfFile: false
+  AtStartOfBlock: false
+  AtEndOfFile: true
+FixNamespaceComments: true
+NamespaceIndentation: All
+SortUsingDeclarations: Lexicographic
