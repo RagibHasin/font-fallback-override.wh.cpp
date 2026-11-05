@@ -82,7 +82,7 @@ static std::optional<DrawRunResult<DrawRun>> RenderThemedTextRuns(
 
     const auto runFlags = textFlags & ~(DT_CENTER | DT_RIGHT);
     std::optional<DrawRunResult<DrawRun>> lastResult;
-    for (const auto& [run, measuredWidth] : std::ranges::views::zip(runs->first, measuredWidths)) {
+    for (const auto& [run, measuredWidth] : std::views::zip(runs->first, measuredWidths)) {
         RECT runRect = *rect;
         runRect.left = currentX;
         runRect.right = currentX + measuredWidth;

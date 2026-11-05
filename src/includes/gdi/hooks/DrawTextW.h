@@ -40,7 +40,7 @@ struct ParsedDrawText {
         const auto [_, charLen] = DecodeCodePoint(text);
         const auto ch = text.substr(0, charLen);
         this->text.append(ch);
-        sourceEnds.append_range(std::ranges::views::repeat(text.cend(), charLen));
+        sourceEnds.append_range(std::views::repeat(text.cend(), charLen));
     }
 
   public:
@@ -303,7 +303,8 @@ struct Context {
         }
 
         for (auto end = text.size(); end > 0;) {
-            const auto test = std::wstring(text.substr(0, end)) + ellipsis;
+            std::wstring test{text.substr(0, end)};
+            test += ellipsis;
             const auto size = MeasureDrawTextRange(test, 0, test.size(), tabWidth);
             if (size && size->cx <= width) {
                 bestEnd = end;
@@ -324,7 +325,8 @@ struct Context {
                 --wordEnd;
             }
             if (wordEnd > 0) {
-                const auto wordCandidate = std::wstring(text.substr(0, wordEnd)) + ellipsis;
+                std::wstring wordCandidate{text.substr(0, wordEnd)};
+                wordCandidate += ellipsis;
                 const auto size =
                     MeasureDrawTextRange(wordCandidate, 0, wordCandidate.size(), tabWidth);
                 if (size && size->cx <= width) {
@@ -375,7 +377,10 @@ struct Context {
             prefix = prefix.substr(0, std::max(0UZ, newLength));
         }
 
-        return std::wstring(ellipsis) + suffix;
+        std::wstring output{ellipsis};
+        output += suffix;
+
+        return output;
     }
 
     bool DrawTextLineWithFallback(
