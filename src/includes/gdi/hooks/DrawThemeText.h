@@ -51,7 +51,8 @@ static std::optional<DrawRunResult<DrawRun>> RenderThemedTextRuns(
         return std::nullopt;
     }
 
-    std::vector<LONG> measuredWidths(runs->first.size());
+    std::vector<LONG> measuredWidths;
+    measuredWidths.reserve(runs->first.size());
 
     int totalWidth = 0;
     for (const auto& run : runs->first) {
@@ -160,7 +161,8 @@ static HRESULT WINAPI DrawThemeTextEx_Hook(
     LPRECT rect,
     const DTTOPTS* options
 ) {
-    if (g_inHook || !text || !rect || count <= 0 || (textFlags & DT_CALCRECT)) {
+    if (g_inHook || !text || !rect || count <= 0 || (textFlags & DT_CALCRECT)
+        || (options && (options->dwFlags & DTT_CALCRECT))) {
         return g_originalDrawThemeTextEx(
             theme, hdc, partId, stateId, text, count, textFlags, rect, options
         );
