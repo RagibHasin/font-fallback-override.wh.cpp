@@ -77,6 +77,7 @@ can therefore be rendered as:
 #include "includes/gdi/hooks/DrawTextW.h"
 #include "includes/gdi/hooks/DrawThemeText.h"
 #include "includes/gdi/hooks/ExtTextOutW.h"
+#include "includes/gdi/hooks/LoadLibraryW.h"
 #include "includes/gdi/hooks/TextOutW.h"
 #include "includes/hooks.h"
 
@@ -161,22 +162,25 @@ BOOL Wh_ModInit() {
     }
 
     const auto successGDI =
-        HookFunctionFromDLL(L"gdi32.dll", "TextOutW", TextOutW_Hook, &g_originalTextOutW)
-        && HookFunctionFromDLL(
-            L"gdi32.dll", "ExtTextOutW", ExtTextOutW_Hook, &g_originalExtTextOutW
-        )
-        && HookFunctionFromDLL(L"user32.dll", "DrawTextW", DrawTextW_Hook, &g_originalDrawTextW)
-        && HookFunctionFromDLL(
-            L"user32.dll", "DrawTextExW", DrawTextExW_Hook, &g_originalDrawTextExW
-        )
-        && HookFunctionFromDLL(
-            L"uxtheme.dll", "DrawThemeText", DrawThemeText_Hook, &g_originalDrawThemeText
-        )
-        && HookFunctionFromDLL(
-            L"uxtheme.dll", "DrawThemeTextEx", DrawThemeTextEx_Hook, &g_originalDrawThemeTextEx
-        )
-        && HookFunctionFromDLL(
-            L"comctl32.dll", "DrawShadowText", DrawShadowText_Hook, &g_originalDrawShadowText
+        (HookFunctionFromDLL(L"gdi32.dll", "TextOutW", TextOutW_Hook, &g_originalTextOutW)
+         && HookFunctionFromDLL(
+             L"gdi32.dll", "ExtTextOutW", ExtTextOutW_Hook, &g_originalExtTextOutW
+         )
+         && HookFunctionFromDLL(L"user32.dll", "DrawTextW", DrawTextW_Hook, &g_originalDrawTextW)
+         && HookFunctionFromDLL(
+             L"user32.dll", "DrawTextExW", DrawTextExW_Hook, &g_originalDrawTextExW
+         )
+         && HookFunctionFromDLL(
+             L"uxtheme.dll", "DrawThemeText", DrawThemeText_Hook, &g_originalDrawThemeText
+         )
+         && HookFunctionFromDLL(
+             L"uxtheme.dll", "DrawThemeTextEx", DrawThemeTextEx_Hook, &g_originalDrawThemeTextEx
+         )
+         && HookFunctionFromDLL(
+             L"comctl32.dll", "DrawShadowText", DrawShadowText_Hook, &g_originalDrawShadowText
+         ))
+        || HookFunctionFromDLL(
+            L"kernelbase.dll", "LoadLibraryExW", LoadLibraryExW_Hook, &g_originalLoadLibraryExW
         );
 
     if (!successGDI) {
