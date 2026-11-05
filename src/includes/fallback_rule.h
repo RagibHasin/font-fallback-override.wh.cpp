@@ -45,11 +45,13 @@ struct FallbackRule {
         HFONT originalFont,
         const std::wstring_view text
     ) const {
-        if (!originalFont || FontHasGlyph(hdc, originalFont, text) || fontFamily.empty()) {
+        LOGFONTW logFont{};
+        if (!originalFont || FontHasGlyph(hdc, originalFont, text) || fontFamily.empty()
+            || GetObjectW(originalFont, sizeof(logFont), &logFont) != sizeof(logFont)) {
             return originalFont;
         }
 
-        FontCacheKey key{.originalFont = originalFont, .family = fontFamily};
+        FontCacheKey key{.originalFont = logFont, .family = fontFamily};
 
         {
             auto fontCache = g_fontCache.lock();
@@ -60,14 +62,11 @@ struct FallbackRule {
             }
         }
 
-        LOGFONTW lf{};
-        if (GetObjectW(originalFont, sizeof(lf), &lf) != sizeof(lf)) {
-            return originalFont;
-        }
+        wcsncpy_s(
+            static_cast<wchar_t*>(logFont.lfFaceName), LF_FACESIZE, fontFamily.c_str(), _TRUNCATE
+        );
 
-        wcsncpy_s(static_cast<wchar_t*>(lf.lfFaceName), LF_FACESIZE, fontFamily.c_str(), _TRUNCATE);
-
-        const auto replacement = CreateFontIndirectW(&lf);
+        const auto replacement = CreateFontIndirectW(&logFont);
         if (!replacement) {
             return originalFont;
         }

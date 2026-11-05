@@ -7,7 +7,7 @@
 // @author          Muhammad Ragib Hasin
 // @github          https://github.com/RagibHasin
 // @include         *
-// @compilerOptions -std=c++26 -luser32 -lgdi32 -ldwrite -lole32 -lwindowsapp
+// @compilerOptions -luser32 -lgdi32 -ldwrite -lole32 -lwindowsapp
 // ==/WindhawkMod==
 
 // ==WindhawkModReadme==
@@ -73,6 +73,7 @@ can therefore be rendered as:
 #include "includes/dwrite/hooks/CreateTextLayout.h"
 #include "includes/dwrite/hooks/GetSystemFontFallback.h"
 #include "includes/fallback_rule.h"
+#include "includes/gdi/font_cache.h"
 #include "includes/gdi/hooks/DrawTextW.h"
 #include "includes/gdi/hooks/DrawThemeText.h"
 #include "includes/gdi/hooks/ExtTextOutW.h"
@@ -101,7 +102,7 @@ static bool InstallDWriteHooks() {
     constexpr auto offsetCreateTextLayout0 = 18UZ;     // 16th of IDWriteFactory
     constexpr auto offsetCreateTextFormat6 = 54UZ;     // 7th of IDWriteFactory6
 
-    const com_ptr<IDWriteFactory> factory0(factory, winrt::take_ownership_from_abi);
+    const winrt::com_ptr<IDWriteFactory> factory0(factory, winrt::take_ownership_from_abi);
     const auto supportsFactory6 = static_cast<bool>(factory0.try_as<IDWriteFactory6>());
 
     using WindhawkUtils::SetFunctionHook;
@@ -187,11 +188,16 @@ BOOL Wh_ModInit() {
 
 void Wh_ModUninit() {
     Wh_Log(L"Font Fallback Override - Uninitializing");
+
+    ClearFontCache();
 }
 
 void Wh_ModSettingsChanged() {
     Wh_Log(L"Settings changed, reloading...");
 
     LoadRules();
+
     *g_fallback.lock_mut() = nullptr;
+
+    ClearFontCache();
 }
