@@ -558,13 +558,13 @@ struct Context {
                     fitEnd
                 );
 
-                const auto lastBreak = static_cast<size_t>(
-                    std::ranges::find_last_if(
-                        text.substr(position, fitEnd - position), &IsDrawTextBreakCharacter
-                    )
-                        .begin()
-                    - text.cbegin()
+                const auto lastBreakRange = std::ranges::find_last_if(
+                    text.substr(position, fitEnd - position), &IsDrawTextBreakCharacter
                 );
+                const auto lastBreak =
+                    lastBreakRange.empty()
+                        ? fitEnd
+                        : static_cast<size_t>(lastBreakRange.begin() - text.cbegin());
 
                 Wh_Log(L"lastBreak: %lld", lastBreak);
 
