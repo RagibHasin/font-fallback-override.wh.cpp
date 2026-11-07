@@ -30,7 +30,9 @@ static BOOL RenderExtTextOutRuns(
 ) {
     Wh_Log(L">");
 
-    if (options & ETO_GLYPH_INDEX) {
+    // TODO: measure and draw for non-left alignment
+    const auto textAlign = GetTextAlign(hdc);
+    if ((options & ETO_GLYPH_INDEX) || (textAlign & TA_RIGHT) || (textAlign & TA_CENTER)) {
         return g_originalExtTextOutW(hdc, x, y, options, rect, text, count, dx);
     }
 
