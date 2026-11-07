@@ -75,18 +75,18 @@ static bool HookFunctionFromDLL(
         reinterpret_cast<Prototype*>(GetProcAddress(module, functionName));
 
     if (!target) {
-        Wh_Log(L"GetProcAddress(%s) failed", functionName);
+        Wh_Log(L"GetProcAddress(%S) failed", functionName);
 
         return false;
     }
 
     if (!WindhawkUtils::SetFunctionHook(target, hook, original)) {
-        Wh_Log(L"SetFunctionHook(%s) failed", functionName);
+        Wh_Log(L"SetFunctionHook(%S) failed", functionName);
 
         return false;
     }
 
-    Wh_Log(L"Hooked %ls!%s", moduleName, functionName);
+    Wh_Log(L"Hooked %ls!%S", moduleName, functionName);
 
     return true;
 }
@@ -102,18 +102,18 @@ static bool HookFunctionInVtable(
     const auto target = reinterpret_cast<Prototype*>((*reinterpret_cast<void***>(vtable))[idx]);
 
     if (!target) {
-        Wh_Log(L"Failed to find entry #%d of the Vtable", idx);
+        Wh_Log(L"Failed to find entry #%u of the Vtable", idx);
 
         return false;
     }
 
     if (!WindhawkUtils::SetFunctionHook(target, hook, original)) {
-        Wh_Log(L"SetFunctionHook failed for entry #%d", idx);
+        Wh_Log(L"SetFunctionHook failed for entry #%u", idx);
 
         return false;
     }
 
-    Wh_Log(L"Hooked entry #%d", idx);
+    Wh_Log(L"Hooked entry #%u", idx);
 
     return true;
 }

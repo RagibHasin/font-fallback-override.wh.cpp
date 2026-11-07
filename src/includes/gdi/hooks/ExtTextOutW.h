@@ -45,7 +45,7 @@ static BOOL RenderExtTextOutRuns(
 
     const std::wstring_view textView(text, count);
 
-    Wh_Log(L"text: \"%.s\", count: %d", count, text, count);
+    Wh_Log(L"text: \"%.*s\", count: %u", count, text, count);
 
     const auto runs = BuildRuns(hdc, originalFont, textView);
     if (!runs || !runs->second) {

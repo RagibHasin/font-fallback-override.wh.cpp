@@ -69,7 +69,7 @@ BuildRuns(
         text = text.substr(charLen);
     }
 
-    Wh_Log(L"> #runs: %d", runs.size());
+    Wh_Log(L"> #runs: %zu", runs.size());
 
     return std::pair{runs, replaced};
 }
