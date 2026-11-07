@@ -52,7 +52,7 @@ struct FallbackRule {
             return originalFont;
         }
 
-        FontCacheKey key{.originalFont = logFont, .family = fontFamily};
+        const FontCacheKey key{.originalFont = logFont, .family = fontFamily};
 
         {
             auto fontCache = g_fontCache.lock();
@@ -77,18 +77,8 @@ struct FallbackRule {
             return originalFont;
         }
 
-        {
-            const auto [it, inserted] = g_fontCache.lock_mut()->emplace(
-                key, std::make_shared<ManagedFontHandle>(replacement)
-            );
-
-            // check if another thread already inserted it
-            if (!inserted) {
-                return it->second;
-            }
-        }
-
-        return replacement;
+        auto handle = std::make_shared<ManagedFontHandle>(replacement);
+        return g_fontCache.lock_mut()->try_emplace(key, handle).first->second;
     }
 };
 
