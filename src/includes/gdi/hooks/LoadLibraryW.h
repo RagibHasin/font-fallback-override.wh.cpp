@@ -5,7 +5,7 @@ using LoadLibraryExW_t = decltype(&LoadLibraryExW);
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 LoadLibraryExW_t g_originalLoadLibraryExW;
 
-static bool InstallGDIHooks(HMODULE);
+extern bool InstallGDIHooks(HMODULE);
 
 HMODULE WINAPI LoadLibraryExW_Hook(
     LPCWSTR name,

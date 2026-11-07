@@ -84,16 +84,16 @@ https://raw.githubusercontent.com/RagibHasin/font-fallback-override.wh.cpp/maste
 #include <windhawk_api.h>
 #include <windhawk_utils.h>
 
-#include "includes/dwrite/hooks/CreateTextFormat.h"
-#include "includes/dwrite/hooks/CreateTextLayout.h"
+#include "includes/dwrite/hooks/CreateTextFormat.h" // IWYU pragma: keep
+#include "includes/dwrite/hooks/CreateTextLayout.h" // IWYU pragma: keep
 #include "includes/dwrite/hooks/GetSystemFontFallback.h"
 #include "includes/fallback_rule.h"
 #include "includes/gdi/font_cache.h"
-#include "includes/gdi/hooks/DrawTextW.h"
-#include "includes/gdi/hooks/DrawThemeText.h"
-#include "includes/gdi/hooks/ExtTextOutW.h"
+#include "includes/gdi/hooks/DrawTextW.h"     // IWYU pragma: keep
+#include "includes/gdi/hooks/DrawThemeText.h" // IWYU pragma: keep
+#include "includes/gdi/hooks/ExtTextOutW.h"   // IWYU pragma: keep
 #include "includes/gdi/hooks/LoadLibraryW.h"
-#include "includes/gdi/hooks/TextOutW.h"
+#include "includes/gdi/hooks/TextOutW.h"      // IWYU pragma: keep
 #include "includes/hooks.h"
 
 static bool InstallDWriteHooks() {
@@ -149,7 +149,7 @@ static bool InstallDWriteHooks() {
     return true;
 }
 
-static bool InstallGDIHooks(const HMODULE module = nullptr) {
+bool InstallGDIHooks(const HMODULE module = nullptr) {
     auto needs_gdi32 = true;
     auto needs_user32 = true;
     auto needs_uxtheme = true;
