@@ -20,7 +20,11 @@ static BOOL RenderTextOutRuns(
     LPCWSTR text,
     int count
 ) {
-    Wh_Log(L">");
+    // TODO: measure and draw for non-left alignment
+    const auto textAlign = GetTextAlign(hdc);
+    if ((textAlign & TA_RIGHT) || (textAlign & TA_CENTER)) {
+        return g_originalTextOutW(hdc, x, y, text, count);
+    }
 
     const auto originalFont = static_cast<HFONT>(GetCurrentObject(hdc, OBJ_FONT));
     if (!originalFont) {
