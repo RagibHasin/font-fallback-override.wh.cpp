@@ -470,7 +470,7 @@ struct Context {
         const RECT* const clipRect,
         const int tabWidth
     ) const {
-        if (offset < 0 || offset >= lineText.size()) {
+        if (offset >= lineText.size()) {
             return;
         }
 
@@ -862,7 +862,7 @@ struct Context {
         LPDRAWTEXTPARAMS params,
         bool allowModifyString
     ) {
-        if (!text || !rect || count < -1 || !g_originalDrawTextW) {
+        if (!text || !rect || count < -1 || count == 0 || !g_originalDrawTextW) {
             return std::nullopt;
         }
 

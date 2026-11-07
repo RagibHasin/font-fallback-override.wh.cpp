@@ -15,7 +15,7 @@
 // original font. We therefore derive LOGFONTW from the currently selected font
 // and only replace lfFaceName.
 //
-// Cache key is original HFONT + replacement family.
+// Cache key is LOGFONTW of the original HFONT + replacement family.
 //
 // The cache is intentionally simple. Font handles are generally long-lived in
 // classic Win32 applications.

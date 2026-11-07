@@ -20,6 +20,10 @@ static BOOL RenderTextOutRuns(
     LPCWSTR text,
     int count
 ) {
+    if (count < -1 || count == 0) {
+        return g_originalTextOutW(hdc, x, y, text, count);
+    }
+
     // TODO: measure and draw for non-left alignment
     const auto textAlign = GetTextAlign(hdc);
     if ((textAlign & TA_RIGHT) || (textAlign & TA_CENTER)) {

@@ -33,7 +33,7 @@ static std::optional<DrawRunResult<DrawRun>> RenderThemedTextRuns(
     DWORD textFlags,
     DrawRun&& drawRun
 ) {
-    if (!text || !rect || count <= 0) {
+    if (!text || !rect) {
         return std::nullopt;
     }
 
@@ -116,7 +116,7 @@ static HRESULT WINAPI DrawThemeText_Hook(
     DWORD textFlags2,
     LPCRECT rect
 ) {
-    if (g_inHook || !text || !rect || count <= 0 || (textFlags & DT_CALCRECT)) {
+    if (g_inHook || !text || !rect || count < -1 || count == 0 || (textFlags & DT_CALCRECT)) {
         return g_originalDrawThemeText(
             theme, hdc, partId, stateId, text, count, textFlags, textFlags2, rect
         );
@@ -162,7 +162,7 @@ static HRESULT WINAPI DrawThemeTextEx_Hook(
     LPRECT rect,
     const DTTOPTS* options
 ) {
-    if (g_inHook || !text || !rect || count <= 0 || (textFlags & DT_CALCRECT)
+    if (g_inHook || !text || !rect || count < -1 || count == 0 || (textFlags & DT_CALCRECT)
         || (options && (options->dwFlags & DTT_CALCRECT))) {
         return g_originalDrawThemeTextEx(
             theme, hdc, partId, stateId, text, count, textFlags, rect, options
