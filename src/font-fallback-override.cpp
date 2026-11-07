@@ -72,9 +72,12 @@ https://raw.githubusercontent.com/RagibHasin/font-fallback-override.wh.cpp/maste
 */
 // ==/WindhawkModSettings==
 
+#include <cstring>
+
 #include <dwrite.h>
 #include <dwrite_2.h>
 #include <dwrite_3.h>
+#include <libloaderapi.h>
 #include <unknwn.h>
 #include <winrt/base.h>
 
@@ -116,49 +119,71 @@ static bool InstallDWriteHooks() {
     constexpr auto offsetCreateTextFormat6 = 54UZ;     // 7th of IDWriteFactory6
 
     const winrt::com_ptr<IDWriteFactory> factory0(factory, winrt::take_ownership_from_abi);
-    const auto supportsFactory6 = static_cast<bool>(factory0.try_as<IDWriteFactory6>());
 
-    if (!HookFunctionInVtable(
-            factory,
-            offsetGetSystemFontFallback,
-            GetSystemFontFallback_Hook,
-            &g_originalGetSystemFontFallback
-        )) {
-        Wh_Log(L"Failed to hook GetSystemFontFallback");
-        return false;
-    }
-    Wh_Log(L"Successfully hooked GetSystemFontFallback");
-
-    if (!HookFunctionInVtable(
-            factory, offsetCreateTextFormat0, CreateTextFormat0_Hook, &g_originalCreateTextFormat0
-        )) {
-        Wh_Log(L"Failed to find CreateTextFormat0");
-        return false;
-    }
-    Wh_Log(L"Successfully hooked CreateTextFormat0");
-
-    if (!HookFunctionInVtable(
-            factory, offsetCreateTextLayout0, CreateTextLayout0_Hook, &g_originalCreateTextLayout0
-        )) {
-        Wh_Log(L"Failed to find CreateTextLayout0");
-        return false;
-    }
-    Wh_Log(L"Successfully hooked CreateTextLayout0");
-
-    if (!supportsFactory6) {
-        Wh_Log(L"System does not support IDWriteFactory6");
-        Wh_Log(L"Did not attempt hooking CreateTextFormat6");
+    if (!factory0.try_as<IDWriteFactory2>()) {
+        Wh_Log(L"System does not support IDWriteFactory2: Skipping DirectWrite hooks");
         return true;
     }
-    if (!HookFunctionInVtable(
-            factory, offsetCreateTextFormat6, CreateTextFormat6_Hook, &g_originalCreateTextFormat6
-        )) {
-        Wh_Log(L"Failed to find CreateTextFormat6");
-        return false;
+
+#define HOOK(f)                                                                                    \
+    if (!HookFunctionInVtable(factory, offset##f, f##_Hook, &g_original##f)) {                     \
+        Wh_Log(L"Failed to hook %S", #f);                                                          \
+        return false;                                                                              \
+    }                                                                                              \
+    Wh_Log(L"Successfully hooked %S", #f);
+
+    HOOK(GetSystemFontFallback);
+    HOOK(CreateTextFormat0);
+    HOOK(CreateTextLayout0);
+
+    if (!factory0.try_as<IDWriteFactory6>()) {
+        Wh_Log(
+            L"System does not support IDWriteFactory6: Skipping IDWriteFactory6::CreateTextFormat"
+        );
+        return true;
     }
-    Wh_Log(L"Successfully hooked CreateTextFormat6");
+    HOOK(CreateTextFormat6);
+
+#undef HOOK
 
     return true;
+}
+
+static bool InstallGDIHooks(const HMODULE module = nullptr) {
+    auto needs_gdi32 = true;
+    auto needs_user32 = true;
+    auto needs_uxtheme = true;
+    auto needs_comctl32 = true;
+
+    auto queued = false;
+
+    if (module) {
+        std::array<wchar_t, MAX_PATH> moduleName{};
+
+        const std::wstring_view moduleNameView(
+            wcslwr(moduleName.data()), GetModuleFileNameW(module, moduleName.data(), MAX_PATH)
+        );
+
+        needs_gdi32 = moduleNameView.ends_with(L"gdi32.dll");
+        needs_user32 = moduleNameView.ends_with(L"user32.dll");
+        needs_uxtheme = moduleNameView.ends_with(L"uxtheme.dll");
+        needs_comctl32 = moduleNameView.ends_with(L"comctl32.dll");
+    }
+
+#define HOOK(dll, f)                                                                               \
+    queued |= needs_##dll && HookFunctionFromDLL(L## #dll L".dll", #f, f##_Hook, &g_original##f)
+
+    HOOK(gdi32, TextOutW);
+    HOOK(gdi32, ExtTextOutW);
+    HOOK(user32, DrawTextW);
+    HOOK(user32, DrawTextExW);
+    HOOK(uxtheme, DrawThemeText);
+    HOOK(uxtheme, DrawThemeTextEx);
+    HOOK(comctl32, DrawShadowText);
+
+#undef HOOK
+
+    return queued;
 }
 
 BOOL Wh_ModInit() {
@@ -171,30 +196,15 @@ BOOL Wh_ModInit() {
         Wh_Log(L"Failed to hook DirectWrite font fallback machinery");
     }
 
-    const auto successGDI =
-        (HookFunctionFromDLL(L"gdi32.dll", "TextOutW", TextOutW_Hook, &g_originalTextOutW)
-         && HookFunctionFromDLL(
-             L"gdi32.dll", "ExtTextOutW", ExtTextOutW_Hook, &g_originalExtTextOutW
-         )
-         && HookFunctionFromDLL(L"user32.dll", "DrawTextW", DrawTextW_Hook, &g_originalDrawTextW)
-         && HookFunctionFromDLL(
-             L"user32.dll", "DrawTextExW", DrawTextExW_Hook, &g_originalDrawTextExW
-         )
-         && HookFunctionFromDLL(
-             L"uxtheme.dll", "DrawThemeText", DrawThemeText_Hook, &g_originalDrawThemeText
-         )
-         && HookFunctionFromDLL(
-             L"uxtheme.dll", "DrawThemeTextEx", DrawThemeTextEx_Hook, &g_originalDrawThemeTextEx
-         )
-         && HookFunctionFromDLL(
-             L"comctl32.dll", "DrawShadowText", DrawShadowText_Hook, &g_originalDrawShadowText
-         ))
-        || HookFunctionFromDLL(
-            L"kernelbase.dll", "LoadLibraryExW", LoadLibraryExW_Hook, &g_originalLoadLibraryExW
-        );
-
+    const auto successGDI = InstallGDIHooks();
     if (!successGDI) {
         Wh_Log(L"Failed to hook one or more GDI routines");
+    }
+
+    if (!HookFunctionFromDLL(
+            L"kernelbase.dll", "LoadLibraryExW", LoadLibraryExW_Hook, &g_originalLoadLibraryExW
+        )) {
+        Wh_Log(L"Failed to hook library loader routine");
     }
 
     return successDWrite || successGDI;
