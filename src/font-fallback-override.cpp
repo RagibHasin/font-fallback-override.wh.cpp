@@ -121,7 +121,7 @@ static bool InstallDWriteHooks() {
     const winrt::com_ptr<IDWriteFactory> factory0(factory, winrt::take_ownership_from_abi);
 
     if (!factory0.try_as<IDWriteFactory2>()) {
-        Wh_Log(L"System does not support IDWriteFactory2: Skipping DirectWrite hooks");
+        Wh_Log(L"System does not support IDWriteFactory2: skipping DirectWrite hooks");
         return true;
     }
 
@@ -138,7 +138,7 @@ static bool InstallDWriteHooks() {
 
     if (!factory0.try_as<IDWriteFactory6>()) {
         Wh_Log(
-            L"System does not support IDWriteFactory6: Skipping IDWriteFactory6::CreateTextFormat"
+            L"System does not support IDWriteFactory6: skipping IDWriteFactory6::CreateTextFormat"
         );
         return true;
     }
@@ -149,29 +149,11 @@ static bool InstallDWriteHooks() {
     return true;
 }
 
-bool InstallGDIHooks(const HMODULE module = nullptr) {
-    auto needs_gdi32 = true;
-    auto needs_user32 = true;
-    auto needs_uxtheme = true;
-    auto needs_comctl32 = true;
-
+bool InstallGDIHooks() {
     auto queued = false;
 
-    if (module) {
-        std::array<wchar_t, MAX_PATH> moduleName{};
-
-        const std::wstring_view moduleNameView(
-            wcslwr(moduleName.data()), GetModuleFileNameW(module, moduleName.data(), MAX_PATH)
-        );
-
-        needs_gdi32 = moduleNameView.ends_with(L"gdi32.dll");
-        needs_user32 = moduleNameView.ends_with(L"user32.dll");
-        needs_uxtheme = moduleNameView.ends_with(L"uxtheme.dll");
-        needs_comctl32 = moduleNameView.ends_with(L"comctl32.dll");
-    }
-
 #define HOOK(dll, f)                                                                               \
-    queued |= needs_##dll && HookFunctionFromDLL(L## #dll L".dll", #f, f##_Hook, &g_original##f)
+    queued |= !g_original##f && HookFunctionFromDLL(L## #dll L".dll", #f, f##_Hook, &g_original##f)
 
     HOOK(gdi32, TextOutW);
     HOOK(gdi32, ExtTextOutW);
