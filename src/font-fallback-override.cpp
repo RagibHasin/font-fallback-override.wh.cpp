@@ -106,8 +106,6 @@ static bool InstallDWriteHooks() {
     const winrt::com_ptr<IDWriteFactory> factory0(factory, winrt::take_ownership_from_abi);
     const auto supportsFactory6 = static_cast<bool>(factory0.try_as<IDWriteFactory6>());
 
-    using WindhawkUtils::SetFunctionHook;
-
     if (!HookFunctionInVtable(
             factory,
             offsetGetSystemFontFallback,

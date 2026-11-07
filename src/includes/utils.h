@@ -55,12 +55,8 @@ static char32_t ParseHex(const WCHAR* str) {
         return 0;
     }
 
-    try {
-        // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
-        return std::wcstoul(str, nullptr, 16);
-    } catch (...) {
-        return 0;
-    }
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
+    return std::wcstoul(str, nullptr, 16);
 }
 
 // MARK: Excerpt from https://github.com/dragazo/rustex begins

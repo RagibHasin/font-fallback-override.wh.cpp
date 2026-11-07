@@ -828,8 +828,7 @@ struct Context {
             std::wstring modified(text);
             std::ranges::sort(modifications, std::ranges::greater{}, &Modification::start);
             for (const auto& [start, length, replacement] : modifications) {
-                if (start >= 0 && length >= 0 && start <= modified.size()
-                    && start + length <= modified.size()) {
+                if (start <= modified.size() && start + length <= modified.size()) {
                     modified.replace(start, length, replacement);
                 }
             }

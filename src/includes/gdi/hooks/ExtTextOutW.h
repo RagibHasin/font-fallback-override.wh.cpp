@@ -45,9 +45,9 @@ static BOOL RenderExtTextOutRuns(
 
     Wh_Log(L">");
 
-    const std::wstring_view textView(text, count < 0 ? wcslen(text) : count);
+    const std::wstring_view textView(text, count);
 
-    Wh_Log(L"text: \"%.s\", count: %d, size: %d", textView.size(), text, count, textView.size());
+    Wh_Log(L"text: \"%.s\", count: %d", count, text, count);
 
     const auto runs = BuildRuns(hdc, originalFont, textView);
     if (!runs || !runs->second) {
