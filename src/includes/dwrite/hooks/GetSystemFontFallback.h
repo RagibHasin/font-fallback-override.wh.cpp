@@ -10,7 +10,7 @@
 
 using winrt::com_ptr;
 
-static const Mutex<com_ptr<IDWriteFontFallback1>> g_fallback;
+static const Mutex<com_ptr<IDWriteFontFallback1>> g_dwriteFallback;
 
 using GetSystemFontFallback_t = HRESULT(STDMETHODCALLTYPE*)(
     IDWriteFactory8* self,
@@ -25,9 +25,9 @@ STDMETHODIMP GetSystemFontFallback_Hook(
     IDWriteFontFallback1** fallback
 ) {
     Wh_Log(L"GetSystemFontFallback");
-    auto fallbackLock = g_fallback.lock_mut();
+    auto dwriteFallback = g_dwriteFallback.lock_mut();
 
-    if (*fallbackLock == nullptr) {
+    if (*dwriteFallback == nullptr) {
         com_ptr<IDWriteFontFallback1> fallback0;
         auto hr = g_originalGetSystemFontFallback(self, fallback0.put());
 
@@ -37,7 +37,8 @@ STDMETHODIMP GetSystemFontFallback_Hook(
             return hr;
         };
 
-        for (const auto& rule : *g_fallbackRules.lock()) {
+        auto fallbackRules = g_fallbackRules.lock();
+        for (const auto& rule : **fallbackRules) {
             const DWRITE_UNICODE_RANGE range{rule.startChar, rule.endChar};
             auto fontFamily = rule.fontFamily.c_str();
             if (FAILED(builder->AddMapping(&range, 1, &fontFamily, 1))) {
@@ -60,11 +61,11 @@ STDMETHODIMP GetSystemFontFallback_Hook(
             *fallback = fallback0.detach();
             return hr;
         };
-        fallback1.as(*fallbackLock);
+        fallback1.as(*dwriteFallback);
 
         Wh_Log(L"Injected overrides");
     }
 
-    fallbackLock->copy_to(fallback);
+    dwriteFallback->copy_to(fallback);
     return S_OK;
 }

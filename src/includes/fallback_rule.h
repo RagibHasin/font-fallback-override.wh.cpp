@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -90,12 +91,10 @@ struct FallbackRule {
     }
 };
 
-static const Mutex<std::vector<FallbackRule>> g_fallbackRules;
+static const Mutex<std::shared_ptr<std::vector<FallbackRule>>> g_fallbackRules;
 
 static void LoadRules() {
-    auto fallbackRules = g_fallbackRules.lock_mut();
-
-    fallbackRules->clear();
+    auto fallbackRules = std::make_shared<std::vector<FallbackRule>>();
 
     using WindhawkUtils::StringSetting;
 
@@ -135,13 +134,15 @@ static void LoadRules() {
     }
 
     Wh_Log(L"Loaded %zu fallback rules", fallbackRules->size());
+
+    *g_fallbackRules.lock_mut() = fallbackRules;
 }
 
 /// Find the user rule that applies to a Unicode scalar.
 ///
 /// Rules are evaluated in declaration order. The first matching rule wins,
 /// matching the spirit of the supplied DirectWrite mod.
-static const FallbackRule* FindRule(char32_t codePoint) {
+static std::shared_ptr<FallbackRule> FindRule(char32_t codePoint) {
     if (codePoint < hiSurrogateBase) {
         Wh_Log(
             L"codePoint: %lc (U+%X)",
@@ -154,9 +155,9 @@ static const FallbackRule* FindRule(char32_t codePoint) {
 
     auto fallbackRules = g_fallbackRules.lock();
 
-    for (const auto& rule : *fallbackRules) {
+    for (auto& rule : **fallbackRules) {
         if (rule.startChar <= codePoint && codePoint <= rule.endChar) {
-            return &rule;
+            return {*fallbackRules, &rule};
         }
     }
 

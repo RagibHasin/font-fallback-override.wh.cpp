@@ -201,7 +201,7 @@ void Wh_ModSettingsChanged() {
 
     LoadRules();
 
-    *g_fallback.lock_mut() = nullptr;
+    *g_dwriteFallback.lock_mut() = nullptr;
 
     ClearFontCache();
 }
