@@ -877,7 +877,11 @@ struct Context {
         };
 
         Wh_Log(
-            L"text: \"%.*s\", count: %d, size: %zu", ctx.text.size(), text, count, ctx.text.size()
+            L"text: \"%.*s\", count: %d, size: %zu",
+            static_cast<int>(ctx.text.size()),
+            text,
+            count,
+            ctx.text.size()
         );
 
         if (ctx.text.size() > INT_MAX / 4) {
