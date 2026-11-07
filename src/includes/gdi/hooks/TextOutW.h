@@ -20,7 +20,7 @@ static BOOL RenderTextOutRuns(
     LPCWSTR text,
     int count
 ) {
-    if (count < -1 || count == 0) {
+    if (!text || count < -1 || count == 0) {
         return g_originalTextOutW(hdc, x, y, text, count);
     }
 
@@ -82,7 +82,7 @@ static BOOL WINAPI TextOutW_Hook(
     LPCWSTR text,
     int count
 ) {
-    if (g_inHook || !text || count <= 0) {
+    if (g_inHook) {
         return g_originalTextOutW(hdc, x, y, text, count);
     }
 
