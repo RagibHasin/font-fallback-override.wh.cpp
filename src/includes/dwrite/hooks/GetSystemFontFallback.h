@@ -61,7 +61,12 @@ STDMETHODIMP GetSystemFontFallback_Hook(
             *fallback = fallback0.detach();
             return hr;
         };
-        fallback1.as(*dwriteFallback);
+        if (!fallback1.try_as(*dwriteFallback)) {
+            Wh_Log(L"CreateFontFallback did not return IDWriteFontFallback1");
+
+            *fallback = fallback0.detach();
+            return E_NOINTERFACE;
+        }
 
         Wh_Log(L"Injected overrides");
     }
