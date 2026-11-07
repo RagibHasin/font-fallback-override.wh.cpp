@@ -561,17 +561,12 @@ struct Context {
                 const auto lastBreakRange = std::ranges::find_last_if(
                     text.substr(position, fitEnd - position), &IsDrawTextBreakCharacter
                 );
-                const auto lastBreak =
-                    lastBreakRange.empty()
-                        ? position
-                        : static_cast<size_t>(lastBreakRange.begin() - text.cbegin());
+                if (!lastBreakRange.empty()) {
+                    const auto lastBreak =
+                        static_cast<size_t>(lastBreakRange.begin() - text.cbegin());
 
-                Wh_Log(L"lastBreak: %zu", lastBreak);
+                    Wh_Log(L"lastBreak: %zu", lastBreak);
 
-                if (lastBreak >= position) {
-                    // A left-aligned line may retain the whitespace that fitted
-                    // after the previous word. Center/right alignment breaks before
-                    // it.
                     if (!(format & (DT_RIGHT | DT_CENTER))) {
                         line.end = line.next = lastBreak + 1;
                     } else {
