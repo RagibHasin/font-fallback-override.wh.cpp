@@ -52,9 +52,9 @@ can therefore be rendered as:
 This mod only works on Windows 8.1 or later.
 
 [before]:
-https://github.com/RagibHasin/font-fallback-override.wh.cpp/blob/master/assets/before.png?raw=true
+https://raw.githubusercontent.com/RagibHasin/font-fallback-override.wh.cpp/master/assets/before.png
 [after]:
-https://github.com/RagibHasin/font-fallback-override.wh.cpp/blob/master/assets/after.png?raw=true
+https://raw.githubusercontent.com/RagibHasin/font-fallback-override.wh.cpp/master/assets/after.png
 */
 // ==/WindhawkModReadme==
 
