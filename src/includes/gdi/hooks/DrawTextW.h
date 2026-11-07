@@ -563,7 +563,7 @@ struct Context {
                 );
                 const auto lastBreak =
                     lastBreakRange.empty()
-                        ? fitEnd
+                        ? position
                         : static_cast<size_t>(lastBreakRange.begin() - text.cbegin());
 
                 Wh_Log(L"lastBreak: %zu", lastBreak);
