@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "includes/fallback_rule.h"
+#include "includes/gdi/font_cache.h"
 #include "includes/utils.h"
 
 /// Run representation.
@@ -13,7 +14,7 @@
 /// A run is a contiguous UTF-16 range that should be rendered with one font.
 struct TextRun {
     std::wstring_view text;
-    HFONT font;
+    FontHandle font;
 };
 
 /// Build runs.
@@ -54,10 +55,9 @@ BuildRuns(
 
         const auto rule = FindRule(codePoint);
         const auto ch = text.substr(0, charLen);
-        const auto selectedFont =
-            rule ? rule->GetReplacementFont(hdc, originalFont, ch) : originalFont;
+        auto selectedFont = rule ? rule->GetReplacementFont(hdc, originalFont, ch) : originalFont;
 
-        replaced |= selectedFont != originalFont;
+        replaced |= get(selectedFont) != originalFont;
 
         if (!runs.empty() && runs.back().font == selectedFont
             && runs.back().text.cend() == text.cbegin()) {

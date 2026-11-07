@@ -65,7 +65,7 @@ static BOOL RenderExtTextOutRuns(
     const auto dxSpan = dx ? std::span{dx, textView.size() * dxFactor} : std::span<INT>{};
     auto currentX = x;
     for (const auto& run : runs->first) {
-        const SelectedObjectGuard fontGuard(hdc, run.font);
+        const SelectedObjectGuard fontGuard(hdc, get(run.font));
         if (!fontGuard) {
             continue;
         }

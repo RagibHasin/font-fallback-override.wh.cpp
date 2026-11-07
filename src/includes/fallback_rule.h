@@ -41,7 +41,7 @@ struct FallbackRule {
     /// This is important because blindly calling CreateFontW with only a family
     /// name would lose DPI-scaled size and visual characteristics of the
     /// control.
-    HFONT GetReplacementFont(
+    FontHandle GetReplacementFont(
         HDC hdc,
         HFONT originalFont,
         const std::wstring_view text
@@ -78,11 +78,12 @@ struct FallbackRule {
         }
 
         {
-            const auto [it, inserted] = g_fontCache.lock_mut()->emplace(key, replacement);
+            const auto [it, inserted] = g_fontCache.lock_mut()->emplace(
+                key, std::make_shared<ManagedFontHandle>(replacement)
+            );
 
             // check if another thread already inserted it
             if (!inserted) {
-                DeleteObject(replacement);
                 return it->second;
             }
         }

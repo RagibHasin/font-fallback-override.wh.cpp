@@ -1,9 +1,11 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <unordered_map>
+#include <variant>
 
 #include "includes/utils.h"
 
@@ -76,15 +78,72 @@ class std::hash<FontCacheKey> {
     }
 };
 
-static const Mutex<std::unordered_map<FontCacheKey, HFONT>> g_fontCache;
+struct ManagedFontHandle {
+  public:
+    ManagedFontHandle(const HFONT font)
+        : font(font) {
+    }
+    ~ManagedFontHandle() {
+        DeleteObject(font);
+    }
+
+    ManagedFontHandle(const ManagedFontHandle&) = delete;
+    ManagedFontHandle(ManagedFontHandle&&) = delete;
+    ManagedFontHandle& operator=(const ManagedFontHandle&) = delete;
+    ManagedFontHandle& operator=(ManagedFontHandle&&) = delete;
+
+    HFONT operator*() const {
+        return font;
+    }
+
+    bool operator==(const ManagedFontHandle& other) const {
+        return font == other.font;
+    }
+    bool operator==(const HFONT other) const {
+        return font == other;
+    }
+
+    bool operator!=(const ManagedFontHandle& other) const {
+        return font != other.font;
+    }
+    bool operator!=(const HFONT other) const {
+        return font != other;
+    }
+
+  private:
+    HFONT font;
+};
+
+bool operator==(
+    const HFONT a,
+    const ManagedFontHandle& b
+) {
+    return b == a;
+}
+bool operator!=(
+    const HFONT a,
+    const ManagedFontHandle& b
+) {
+    return b != a;
+}
+
+using FontHandle = std::variant<std::shared_ptr<ManagedFontHandle>, HFONT>;
+
+HFONT get(const FontHandle& handle) {
+    if (std::holds_alternative<HFONT>(handle)) {
+        return std::get<HFONT>(handle);
+    }
+    return **std::get<std::shared_ptr<ManagedFontHandle>>(handle);
+}
+
+static const Mutex<std::unordered_map<FontCacheKey, std::shared_ptr<ManagedFontHandle>>>
+    g_fontCache;
 
 static void ClearFontCache() {
     auto fontCache = g_fontCache.lock_mut();
 
     for (auto& [_, font] : *fontCache) {
-        if (font) {
-            DeleteObject(font);
-        }
+        font.reset();
     }
 
     fontCache->clear();

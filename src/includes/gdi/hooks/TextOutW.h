@@ -40,7 +40,7 @@ static BOOL RenderTextOutRuns(
     int currentX = x;
 
     for (const auto& run : runs->first) {
-        const SelectedObjectGuard fontGuard(hdc, run.font);
+        const SelectedObjectGuard fontGuard(hdc, get(run.font));
         if (!fontGuard) {
             continue;
         }

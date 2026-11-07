@@ -155,7 +155,7 @@ struct Context {
             return SIZE{0, 0};
         }
 
-        const SelectedObjectGuard fontGuard(hdc, run.font);
+        const SelectedObjectGuard fontGuard(hdc, get(run.font));
         if (!fontGuard) {
             return std::nullopt;
         }
@@ -417,7 +417,7 @@ struct Context {
                     return false;
                 }
 
-                const SelectedObjectGuard fontGuard(hdc, run.font);
+                const SelectedObjectGuard fontGuard(hdc, get(run.font));
                 if (!fontGuard) {
                     return false;
                 }

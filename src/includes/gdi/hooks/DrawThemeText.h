@@ -56,7 +56,7 @@ static std::optional<DrawRunResult<DrawRun>> RenderThemedTextRuns(
 
     int totalWidth = 0;
     for (const auto& run : runs->first) {
-        const SelectedObjectGuard fontGuard(hdc, run.font);
+        const SelectedObjectGuard fontGuard(hdc, get(run.font));
         if (!fontGuard) {
             return std::nullopt;
         }
@@ -124,7 +124,7 @@ static HRESULT WINAPI DrawThemeText_Hook(
     const HookGuard _;
     const auto result = RenderThemedTextRuns(
         hdc, text, count, rect, textFlags, [&](const TextRun& run, RECT& runRect, DWORD runFlags) {
-            const SelectedObjectGuard fontGuard(hdc, run.font);
+            const SelectedObjectGuard fontGuard(hdc, get(run.font));
             if (!fontGuard) {
                 return E_FAIL;
             }
@@ -172,7 +172,7 @@ static HRESULT WINAPI DrawThemeTextEx_Hook(
 
     const auto result = RenderThemedTextRuns(
         hdc, text, count, rect, textFlags, [&](const TextRun& run, RECT& runRect, DWORD runFlags) {
-            const SelectedObjectGuard fontGuard(hdc, run.font);
+            const SelectedObjectGuard fontGuard(hdc, get(run.font));
             if (!fontGuard) {
                 return E_FAIL;
             }
@@ -223,7 +223,7 @@ static int WINAPI DrawShadowText_Hook(
         rect,
         flags,
         [&](const TextRun& run, RECT& runRect, DWORD runFlags) {
-            const SelectedObjectGuard fontGuard(hdc, run.font);
+            const SelectedObjectGuard fontGuard(hdc, get(run.font));
             if (!fontGuard) {
                 return 0;
             }
