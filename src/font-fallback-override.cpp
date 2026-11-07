@@ -43,18 +43,13 @@ can therefore be rendered as:
 
     original font -> Bengali fallback -> original font -> CJK fallback
 
-| Before            | After           |
-| ----------------- | --------------- |
-| ![Before][before] | ![After][after] |
+### Before
 
-## Notice
+![Before](https://raw.githubusercontent.com/RagibHasin/font-fallback-override.wh.cpp/master/assets/before.png)
 
-This mod only works on Windows 8.1 or later.
+### After
 
-[before]:
-https://raw.githubusercontent.com/RagibHasin/font-fallback-override.wh.cpp/master/assets/before.png
-[after]:
-https://raw.githubusercontent.com/RagibHasin/font-fallback-override.wh.cpp/master/assets/after.png
+![After](https://raw.githubusercontent.com/RagibHasin/font-fallback-override.wh.cpp/master/assets/after.png)
 */
 // ==/WindhawkModReadme==
 
