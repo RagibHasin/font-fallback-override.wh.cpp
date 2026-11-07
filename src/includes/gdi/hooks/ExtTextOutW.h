@@ -53,6 +53,12 @@ static BOOL RenderExtTextOutRuns(
         return g_originalExtTextOutW(hdc, x, y, options, rect, text, count, dx);
     }
 
+    if (options & ETO_OPAQUE) {
+        g_originalExtTextOutW(hdc, x, y, ETO_OPAQUE, rect, nullptr, 0, nullptr);
+    }
+
+    options &= ~ETO_OPAQUE;
+
     const size_t dxFactor = (options & ETO_PDY) ? 2 : 1;
     const auto dxSpan = dx ? std::span{dx, textView.size() * dxFactor} : std::span<INT>{};
     auto currentX = x;
