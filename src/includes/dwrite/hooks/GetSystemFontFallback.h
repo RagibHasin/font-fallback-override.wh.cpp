@@ -10,11 +10,11 @@
 
 using winrt::com_ptr;
 
-static const Mutex<com_ptr<IDWriteFontFallback1>> g_dwriteFallback;
+static const Mutex<com_ptr<IDWriteFontFallback>> g_dwriteFallback;
 
 using GetSystemFontFallback_t = HRESULT(STDMETHODCALLTYPE*)(
     IDWriteFactory8* self,
-    IDWriteFontFallback1** fallback
+    IDWriteFontFallback** fallback
 );
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
@@ -22,13 +22,13 @@ static GetSystemFontFallback_t g_originalGetSystemFontFallback = nullptr;
 
 STDMETHODIMP GetSystemFontFallback_Hook(
     IDWriteFactory8* self,
-    IDWriteFontFallback1** fallback
+    IDWriteFontFallback** fallback
 ) {
     Wh_Log(L"GetSystemFontFallback");
     auto dwriteFallback = g_dwriteFallback.lock_mut();
 
     if (*dwriteFallback == nullptr) {
-        com_ptr<IDWriteFontFallback1> fallback0;
+        com_ptr<IDWriteFontFallback> fallback0;
         auto hr = g_originalGetSystemFontFallback(self, fallback0.put());
 
         com_ptr<IDWriteFontFallbackBuilder> builder;
@@ -61,12 +61,7 @@ STDMETHODIMP GetSystemFontFallback_Hook(
             *fallback = fallback0.detach();
             return hr;
         };
-        if (!fallback1.try_as(*dwriteFallback)) {
-            Wh_Log(L"CreateFontFallback did not return IDWriteFontFallback1");
-
-            *fallback = fallback0.detach();
-            return E_NOINTERFACE;
-        }
+        *dwriteFallback = std::move(fallback1);
 
         Wh_Log(L"Injected overrides");
     }
