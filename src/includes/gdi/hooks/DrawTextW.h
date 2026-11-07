@@ -536,7 +536,7 @@ struct Context {
             .start = position, .end = paragraphEnd, .next = paragraphEnd, .ellipsified = false
         };
 
-        Wh_Log(L"line.next: %lld", line.next);
+        Wh_Log(L"line.next: %zu", line.next);
 
         // DrawText's word wrapping is opt-in. Without DT_WORDBREAK, a paragraph is
         // one line and is only clipped/ellipsified according to the requested
@@ -552,7 +552,7 @@ struct Context {
                     FindFittingPrefix(text, position, paragraphEnd, availableWidth, tabWidth);
 
                 Wh_Log(
-                    L"fullWidth: %ld, availableWidth: %ld, fitEnd: %lld",
+                    L"fullWidth: %ld, availableWidth: %ld, fitEnd: %zu",
                     fullSize->cx,
                     availableWidth,
                     fitEnd
@@ -566,7 +566,7 @@ struct Context {
                         ? fitEnd
                         : static_cast<size_t>(lastBreakRange.begin() - text.cbegin());
 
-                Wh_Log(L"lastBreak: %lld", lastBreak);
+                Wh_Log(L"lastBreak: %zu", lastBreak);
 
                 if (lastBreak >= position) {
                     // A left-aligned line may retain the whitespace that fitted
@@ -606,7 +606,7 @@ struct Context {
                         ++line.next;
                     }
                 }
-                Wh_Log(L"line.next: %lld", line.next);
+                Wh_Log(L"line.next: %zu", line.next);
             }
         }
 
@@ -619,7 +619,7 @@ struct Context {
                 ++line.next;
             }
         }
-        Wh_Log(L"line.next: %lld", line.next);
+        Wh_Log(L"line.next: %zu", line.next);
 
         // Empty paragraphs still represent a logical line.
         line.end = std::max(line.end, line.start);
@@ -716,7 +716,7 @@ struct Context {
         std::vector<Modification> modifications;
 
         for (;;) {
-            Wh_Log(L"position: %lld", position);
+            Wh_Log(L"position: %zu", position);
             const auto offsetY =
                 ((format & DT_EDITCONTROL) ? 2 * safeLineHeight - 1 : safeLineHeight);
             const auto lastLine = !(format & DT_NOCLIP)
@@ -877,7 +877,9 @@ struct Context {
             .originalFont = static_cast<HFONT>(GetCurrentObject(hdc, OBJ_FONT))
         };
 
-        Wh_Log(L"text: \"%s\", count: %d, size: %d", text, count, ctx.text.size());
+        Wh_Log(
+            L"text: \"%.s\", count: %d, size: %d", ctx.text.size(), text, count, ctx.text.size()
+        );
 
         if (ctx.text.size() > INT_MAX / 4) {
             return std::nullopt;

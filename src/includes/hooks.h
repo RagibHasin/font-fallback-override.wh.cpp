@@ -75,18 +75,18 @@ static bool HookFunctionFromDLL(
         reinterpret_cast<Prototype*>(GetProcAddress(module, functionName));
 
     if (!target) {
-        Wh_Log(L"GetProcAddress(%S) failed", functionName);
+        Wh_Log(L"GetProcAddress(%s) failed", functionName);
 
         return false;
     }
 
     if (!WindhawkUtils::SetFunctionHook(target, hook, original)) {
-        Wh_Log(L"SetFunctionHook(%S) failed", functionName);
+        Wh_Log(L"SetFunctionHook(%s) failed", functionName);
 
         return false;
     }
 
-    Wh_Log(L"Hooked %LS!%S", moduleName, functionName);
+    Wh_Log(L"Hooked %ls!%s", moduleName, functionName);
 
     return true;
 }

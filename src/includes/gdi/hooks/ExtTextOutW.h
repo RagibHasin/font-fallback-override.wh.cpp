@@ -45,11 +45,10 @@ static BOOL RenderExtTextOutRuns(
 
     Wh_Log(L">");
 
-    const auto textView = std::wstring_view(text, count < 0 ? wcslen(text) : count);
+    const std::wstring_view textView(text, count < 0 ? wcslen(text) : count);
 
-    Wh_Log(L"text: \"%s\", count: %d, size: %d", text, count, textView.size());
+    Wh_Log(L"text: \"%.s\", count: %d, size: %d", textView.size(), text, count, textView.size());
 
-    Wh_Log(L">");
     const auto runs = BuildRuns(hdc, originalFont, textView);
     if (!runs || !runs->second) {
         return g_originalExtTextOutW(hdc, x, y, options, rect, text, count, dx);

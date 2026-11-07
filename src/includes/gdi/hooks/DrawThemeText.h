@@ -37,9 +37,10 @@ static std::optional<DrawRunResult<DrawRun>> RenderThemedTextRuns(
         return std::nullopt;
     }
 
-    Wh_Log(L"text: \"%s\", count: %d", text, count);
+    const std::wstring_view textView(text, count < 0 ? wcslen(text) : count);
 
-    const std::wstring_view textView(text, static_cast<size_t>(count));
+    Wh_Log(L"text: \"%.s\", count: %d, size: %d", textView.size(), text, count, textView.size());
+
     const auto originalFont = static_cast<HFONT>(GetCurrentObject(hdc, OBJ_FONT));
     if (!originalFont) {
         return std::nullopt;
