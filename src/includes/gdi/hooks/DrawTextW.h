@@ -49,10 +49,9 @@ struct ParsedDrawText {
     ParsedDrawText(
         std::wstring_view text,
         const UINT format
-    )
-        : text(text)
-        , sourceEnds(text.size()) {
-        this->text.clear();
+    ) {
+        this->text.reserve(text.size());
+        sourceEnds.reserve(text.size());
 
         const auto noPrefix = (format & DT_NOPREFIX) != 0;
         const auto hidePrefix = (format & DT_HIDEPREFIX) != 0;
